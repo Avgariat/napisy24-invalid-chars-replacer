@@ -24,6 +24,11 @@ char_map = {
 }
 
 
+allowed_extensions = {
+    'txt', 'srt',
+}
+
+
 def on_start():
     if not os.path.isdir(out_dir):
         os.mkdir(out_dir)
@@ -33,6 +38,10 @@ def get_fixed_text(text):
     for invalid_char, valid_char in char_map.items():
         text = text.replace(invalid_char, valid_char)
     return text
+
+
+def has_allowed_ext(file_name: str):
+    return any(file_name.endswith(f'.{ext}') for ext in allowed_extensions)
 
 
 if __name__ == '__main__':
@@ -46,6 +55,9 @@ if __name__ == '__main__':
     changed_count = 0
 
     for filename in filenames:
+        if not has_allowed_ext(filename):
+            continue
+
         has_changed = False
         with open(filename, "r", encoding="utf-8") as in_file:
             with open(os.path.join(out_dir, filename), "w", encoding=out_encoding) as out_file:
