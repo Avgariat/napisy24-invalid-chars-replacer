@@ -23,9 +23,24 @@ char_map = {
     "Ñ": "Ń",
 }
 
+
+def on_start():
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+
+
+def get_fixed_text(text):
+    for invalid_char, valid_char in char_map.items():
+        text = text.replace(invalid_char, valid_char)
+    return text
+
+
 if __name__ == '__main__':
-    script_name = os.path.basename(__file__)
+    on_start()
+
     _, _, filenames = next(walk("."))
+
+    script_name = os.path.basename(__file__)
     filenames.remove(script_name)
 
     changed_count = 0
@@ -33,14 +48,9 @@ if __name__ == '__main__':
     for filename in filenames:
         has_changed = False
         with open(filename, "r", encoding="utf-8") as in_file:
-            if not os.path.isdir(out_dir):
-                os.mkdir(out_dir)
-
             with open(os.path.join(out_dir, filename), "w", encoding=out_encoding) as out_file:
                 for line in in_file:
-                    valid_line = line
-                    for invalid_char, valid_char in char_map.items():
-                        valid_line = valid_line.replace(invalid_char, valid_char)
+                    valid_line = get_fixed_text(line)
                     out_file.write(valid_line)
                     if line != valid_line:
                         has_changed = True
