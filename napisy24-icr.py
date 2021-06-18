@@ -59,13 +59,19 @@ if __name__ == '__main__':
             continue
 
         has_changed = False
-        with open(filename, "r", encoding="utf-8") as in_file:
-            with open(os.path.join(out_dir, filename), "w", encoding=out_encoding) as out_file:
-                for line in in_file:
-                    valid_line = get_fixed_text(line)
-                    out_file.write(valid_line)
-                    if line != valid_line:
-                        has_changed = True
+        dest_file = os.path.join(out_dir, filename)
+        try:
+            with open(filename, "r", encoding="utf-8") as in_file:
+                with open(dest_file, "w", encoding=out_encoding) as out_file:
+                    for line in in_file:
+                        valid_line = get_fixed_text(line)
+                        out_file.write(valid_line)
+                        if line != valid_line:
+                            has_changed = True
+        except UnicodeDecodeError:
+            print(f"Could not process file '{filename}' since it is not utf-8 encoded")
+            if os.path.isfile(dest_file):
+                os.remove(dest_file)
         if has_changed is True:
             changed_count += 1
 
